@@ -1,0 +1,5 @@
+# ....... Install dependencies for labs
+-r src/requirements.txt
+
+# ....... Install dependencies for documentation
+mkdocs-material
