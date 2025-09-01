@@ -1,0 +1,19 @@
+# ....... Install dependencies for labs
+# -r src/requirements.txt
+
+# ....... Install dependencies for documentation
+mkdocs-material
+
+## Core libraries
+python-dotenv   # Environment variables
+ipykernel       # Jupyter Notebooks
+
+## Data manipulation and visualization
+matplotlib==3.10.3  # For creating visualizations
+numpy==2.3.1        # For numerical computations
+pandas              # For data manipulation and analysis
+
+## ..... Azure Dependencies
+azure-search-documents==11.5.3  # For Azure AI Search
+azure-identity                  # For Azure authentication
+azure-ai-evaluation             # For Azure evaluation
