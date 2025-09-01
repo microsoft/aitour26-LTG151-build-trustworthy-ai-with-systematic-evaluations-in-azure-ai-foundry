@@ -62,14 +62,15 @@ _We recommend you provision the infrastructure and run the notebooks ahead of th
 
 Encourage attendees to come talk to you after for Q&A - this gives you and them a chance to explore the code or live demo interactively with less time co
 
-**Demo Setup**: This repository is provisioned with a devcontainer - just launch it with GitHub Codespaces (cloud) or Docker Desktop (local) to get a prebuilt development environment. Then follow these steps:
+**Demo Setup**: This repository is provisioned with a devcontainer - just launch it with GitHub Codespaces (cloud) or Docker Desktop (local) to get a prebuilt development environment. 
 
-| Step   | Description 
+Then follow these steps to complete demo setup and validate them before session
+
+| Step   | Instructions
 --------------|-------------
-Setup Infra   | Run deployment script
-Validate      | Run deployment script
-Demo 1        | Run Safety & Quality evals
-Demo 2        | Run New evals
-Teardown      | Delete resource group
-
-**Demo Walkthrough**: This section will be updated with a link to step-by-step instructions for demo walkthrough - `TODO`
+Setup    | [1. Setup Infrastructure](./../src/readme.md)
+Validate | [2. Validate Setup](./../src/readme.md)
+Demo 1   | [3. Run Notebook 1](./../src/readme.md)
+Demo 2   | [4. Run Notebook 2](./../src/readme.md)
+Teardown | [5. Teardown Infrastructure](./../src/readme.md)
+| | |
