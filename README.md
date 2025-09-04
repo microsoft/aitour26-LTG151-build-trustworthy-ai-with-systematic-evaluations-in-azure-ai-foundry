@@ -84,6 +84,14 @@ By the end of this session, learners will be able to:
         <br/>
         <a href="https://linkedin.com/in/nityan" title="talk">📢</a> 
     </td>
+    <td align="center">
+        <a href="http://github.com/slister1001">
+            <img src="https://github.com/slister1001.png" width="100px;" alt="Sydney Lister"/><br />
+            <sub> <b> Sydney Lister</b> </sub>
+        </a>
+        <br/>
+        <a href="https://www.linkedin.com/in/sydney-lister/" title="talk">📢</a> 
+    </td>
 </tr></table>
 
 <br/>
