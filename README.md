@@ -22,9 +22,7 @@
 
 ### **Session Description**
 
-Building generative AI apps starts with model selection—but earning user trust requires continuous evaluation. 
-
-In this talk, learn how Azure AI Evaluations SDK helps assess models pre- and post-production, analyze results, and improve quality through Observability.
+Building generative AI apps starts with model selection—but earning user trust requires continuous evaluation. In this talk, learn how Azure AI Evaluations SDK helps assess models pre- and post-production, analyze results, and improve quality through Observability.
 
 
 
@@ -32,10 +30,11 @@ In this talk, learn how Azure AI Evaluations SDK helps assess models pre- and po
 
 By the end of this session, learners will be able to:
 
-- Describe what Observability is, and why it is critical for building trustworthy AI applications end-to-end.
-- Describe the different types of Evaluators, and how they help developers assess quality, safety and performance in agentic AI.
-- Run evaluations on their target model or application - then view and analyze relevant results in the Azure AI Foundry portal
-- Understand how Azure AI Foundry delivers end-to-end observability support through a rich set of tools and features.
+1. Understand the E2E Observability support in Azure AI Foundry
+1. Explore and use built-in evaluators for quality & safety
+1. Explore and use built-in evaluators for agentic AI
+1. Create and run evaluations on their own models and agents
+1. View and analyze evaluation results in Azure AI Foundry 
 
 
 ### **Technologies Used**

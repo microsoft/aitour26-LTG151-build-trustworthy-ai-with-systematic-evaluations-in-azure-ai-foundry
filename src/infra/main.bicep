@@ -21,20 +21,20 @@
   'southeastasia'
 ])
 @description('The Azure region where your AI Foundry resource and project will be created.')
-param location string = 'eastus'
+param location string = 'westus'
 
 @maxLength(9)
 @description('The name of the Azure AI Foundry resource.')
-param aiServices string = 'foundy'
+param aiServices string = 'ltg151aif'
 
 @description('Name for your project resource.')
-param firstProjectName string = 'project'
+param firstProjectName string = 'ltg151aif-proj'
 
 @description('This project will be a sub-resource of your account')
-param projectDescription string = 'some description'
+param projectDescription string = 'AI Tour LTG151 Theater Demo'
 
 @description('The display name of the project')
-param displayName string = 'project'
+param displayName string = 'LTG151 Theater Demo'
 
 // Model deployment parameters
 @description('The name of the model you want to deploy')
@@ -44,7 +44,7 @@ param modelName string = 'gpt-4o'
 param modelFormat string = 'OpenAI'
 
 @description('The version of your model')
-param modelVersion string = '2024-05-13'
+param modelVersion string = '2024-11-20'
 
 @description('The sku of your model deployment')
 param modelSkuName string = 'GlobalStandard'

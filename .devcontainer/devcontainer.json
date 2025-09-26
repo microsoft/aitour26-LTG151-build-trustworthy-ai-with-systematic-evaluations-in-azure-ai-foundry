@@ -7,7 +7,8 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/azure/azure-dev/azd:0": {}
+		"ghcr.io/azure/azure-dev/azd:0": {},
+		"ghcr.io/devcontainers/features/node:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -22,7 +23,8 @@
 			"extensions": [
 				"ms-azuretools.vscode-azure-github-copilot",
 				"ms-python.python",
-				"ms-toolsai.jupyter"
+				"ms-toolsai.jupyter",
+				"ms-azuretools.vscode-azure-mcp-server"
 			]
 		}
 	},
