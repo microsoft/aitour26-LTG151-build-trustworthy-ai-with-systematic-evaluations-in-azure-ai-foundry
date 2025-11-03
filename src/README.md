@@ -124,11 +124,72 @@ We'll use [this setup guidance](https://learn.microsoft.com/en-us/azure/ai-found
 
 Let's walk through each demo first. Then we'll talk through the run of show and you can decide which subset to show based on time and familiarity.
 
+### Scenario: Zava Enterprise Retail
+
+Zava is a fictitious enterprise retailer of home improvement goods for DIV enthusiasts. They want _you_ (the AI Engineer) to build a trustworthy AI shoppers assistant (chatbot) that can respond to user questions in a polite, helpful, and factual manner. Your mission:
+
+1. Model Selection - find the right starting model for the job
+1. Dataset Generation - create a dataset of test prompts for evaluation
+1. AI-Assisted Evaluation - setup a testing harness to assess performance
+1. Built-in Evaluators - select metrics to track for trustworthy AI
+1. E2E Observability - there's more: tracing, red-teaming, monitoring!
+
+**Takeaway Message** 
+- Azure AI Foundry provides a unified platform for developing agentic AI
+- Trustworthy AI builds on E2E observability - from plan to production!
+
 ### Demo 1: Leaderboards
+
+[Model Leaderboards](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-benchmarks) streamline the model selection process using industry-standard benchmarks to assess the performance and behavior of models in the catalog. For this demo, simply keep the [Leaderboards page](https://ai.azure.com/explore/models/leaderboard) open and talk through 3 features that help model selection.
+
+1. **Highlights: Which Models Ranks Highest?**
+
+    - Get a sense for the top model performers for given criteria 
+    - Criteria include: quality, safety, cost, or throughput.
+    - This is across the _entire_ model catalog of choices (no filter)
+    - Example: _gpt-5 is safest but Ministral-3B is cheapest_
+        ![Highlights](./assets/01-model-highlights.png)
+
+1. **Tradeoffs: Compare Between Metrics**
+
+    - What if top-ranked in one is lowest-ranked in another category?
+    - Tradeoffs help you make sense of performance _across_ metrics.
+    - Example: 
+        - Ministral-3B is cheapest model but also lowest quality.
+        - GPT-5 is highest quality but relatively more expensive.
+        - o3-mini is middle ground in cost and quality
+        ![Highlights](./assets/02-model-tradeoffs.png)
+
+1. **Scenarios: Rank Models By Task Category**
+    - The above look at a broad set of benchmarks for various categories
+    - What if I wanted to look at top-ranked models for specific task?
+    - o3 ranks high in Reasoning - but low in vulnerability to harmful behavior
+    - gpt-5 is great at Math - but moderately vulnerable to harmful behavior
+    - Use _Models selected_ filter - compare your own subset of candidates!
+
+1. **Congratulations!!** - You used evaluators to do your model selection!
+
+<br/>
 
 ### Demo 2: Simulator
 
+Just like applications have _test-driven development_, AI applications have _evaluation-driven development_ where the "testing" assesses response quality & safety (for models) and execution efficiency (for agents). But to run tests, we need a _testing dataset_ that provides representative queries (prompts) and "ground truth" (context) that we can then use to evaluate others.
+
+But where can you get this data if you have yet to build an application? 
+- The Evaluation SDK has a Simulator to generate synthetic data
+- It can generate "N" rows of test data from an Azure AI Search index
+- You can now get "starter" testing datasets from your product catalog data
+
+
+**Try it out**: Run the [02-simulate-dataset.ipynb](./notebooks/02-simulate-dataset.ipynb) notebook. You should see an end-result like this with 10 question-answer pairs generated based on the Azure AI Search index with a seed query on "eggshell paint". _You can now use this query/truth/response dataset as test inputs for evaluations_.
+
+![Simulator Results](./assets/04-simulator-results.png)
+
+<br/>
+
 ### Demo 3: Evaluation Flow
+
+<br/>
 
 ### Demo 4: Evaluators
 

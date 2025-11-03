@@ -69,17 +69,24 @@ fi
 
 OPENAI_API_VERSION="2025-02-01-preview"
 
-# Get AI Search endpoint and index name
-AISEARCH_RESOURCE=$(az resource list --resource-group "$RESOURCE_GROUP" --resource-type "Microsoft.Search/searchServices" --query "[0].name" -o tsv)
-AISEARCH_ENDPOINT="https://${AISEARCH_RESOURCE}.search.windows.net/"
-AISEARCH_INDEX="zava-products"
+# Get AI Search endpoint, index name, and API key
+SEARCH_RESOURCE=$(az resource list --resource-group "$RESOURCE_GROUP" --resource-type "Microsoft.Search/searchServices" --query "[0].name" -o tsv)
+SEARCH_ENDPOINT="https://${SEARCH_RESOURCE}.search.windows.net/"
+SEARCH_INDEX="zava-products"
+
+# Get AI Search API key
+SEARCH_API_KEY=$(az search admin-key show --resource-group "$RESOURCE_GROUP" --service-name "$SEARCH_RESOURCE" --query "primaryKey" -o tsv 2>/dev/null)
+if [ -z "$SEARCH_API_KEY" ]; then
+  echo "Warning: Could not retrieve Search API key automatically. You may need to retrieve it manually from the Azure Portal."
+  SEARCH_API_KEY="<retrieve-from-portal>"
+fi
 
 # Model deployment info (from README)
 OPENAI_DEPLOYMENT="gpt-4.1"
 OPENAI_MODEL_VERSION="2025-04-14"
 
 # Data file path
-AISEARCH_DATAFILE="data/products.csv"
+SEARCH_DATAFILE="data/products.csv"
 
 # Function to update or add env variable
 update_env_var() {
@@ -105,9 +112,10 @@ update_env_var "AZURE_AI_FOUNDRY_NAME" "$AI_FOUNDRY_NAME"
 update_env_var "AZURE_AI_PROJECT_NAME" "$AI_PROJECT_NAME"
 update_env_var "AZURE_OPENAI_DEPLOYMENT" "$OPENAI_DEPLOYMENT"
 update_env_var "AZURE_OPENAI_MODEL_VERSION" "$OPENAI_MODEL_VERSION"
-update_env_var "AZURE_AISEARCH_DATAFILE" "$AISEARCH_DATAFILE"
-update_env_var "AZURE_AISEARCH_ENDPOINT" "$AISEARCH_ENDPOINT"
-update_env_var "AZURE_AISEARCH_INDEX" "$AISEARCH_INDEX"
+update_env_var "AZURE_SEARCH_DATAFILE" "$SEARCH_DATAFILE"
+update_env_var "AZURE_SEARCH_ENDPOINT" "$SEARCH_ENDPOINT"
+update_env_var "AZURE_SEARCH_INDEX_NAME" "$SEARCH_INDEX"
+update_env_var "AZURE_SEARCH_API_KEY" "$SEARCH_API_KEY"
 
 echo ".env file updated at: $ENV_FILE"
 echo "Successfully populated values from resource group: $RESOURCE_GROUP"
