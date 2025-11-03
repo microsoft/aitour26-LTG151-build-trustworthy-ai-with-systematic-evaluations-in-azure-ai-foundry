@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "westus"
+      "value": "francecentral"
     },
     "aiServices": {
       "value": "aiservice"
@@ -24,7 +24,7 @@
       "value": "GlobalStandard"
     },
     "modelCapacity": {
-      "value": 1
+      "value": 30
     },
     "aiSearchResourceId": {
       "value": ""

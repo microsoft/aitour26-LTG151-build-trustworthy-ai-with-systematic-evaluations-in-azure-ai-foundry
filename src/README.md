@@ -40,12 +40,21 @@ The run of show below provides a high level view of slides with blue tiles indic
 
 We'll use [this setup guidance](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/environment-setup) with the [Azure AI Foundry Agent Service Standard Setup](https://github.com/azure-ai-foundry/foundry-samples/tree/main/samples/microsoft/infrastructure-setup/41-standard-agent-setup) template to provision an Azure AI Foundry project and resource for this demo. The code can be found under the `infra/` folder.
 
+**Note:** When picking a region check that it supports:
+ - [Content safety](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview#region-availability)
+ - [Azure AI Search](https://learn.microsoft.com/en-us/azure/search/search-region-support#americas)
+ - [Risk and Safety Evaluators](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/risk-safety-evaluators#azure-ai-foundry-project-configuration-and-region-support)
+ - Capacity of 30 for the chosen model you want to deploy (e.g., GPT-4.1)
+
+ _The options are ideally France Central, Sweden Central or East US2_. A backup is _North Central US_ but it lacks support for Groundedness evaluators.
+
 ![Setup](./assets/standard-agent-setup.png)
 
 1. First, update `infra/azuredeploy.parameters.json` to customize any parameters. I set:
     - _modelName_ to `gpt-4.1`
     - _modelVersion_ to `2025-04-14` to match
-    - _location_ to `westus` 
+    - _location_ to `francecentral` 
+    - _modelCapacity_ to `30`
 
 1. Next, deploy the template by following these steps:
 
@@ -94,7 +103,7 @@ We'll use [this setup guidance](https://learn.microsoft.com/en-us/azure/ai-found
 
 1. Run script to update access roles. This takes just a minute.
     ```bash
-    ./infra/scripts/update-roles.sh 
+    ./src/scripts/update-roles.sh 
     ```
 1. Manually add an `embedding model` to your AI Foundry Project
     - Visit [Azure AI Foundry portal](https://ai.azure.com)
@@ -158,7 +167,7 @@ Zava is a fictitious enterprise retailer of home improvement goods for DIV enthu
         - Ministral-3B is cheapest model but also lowest quality.
         - GPT-5 is highest quality but relatively more expensive.
         - o3-mini is middle ground in cost and quality
-        ![Highlights](./assets/02-model-tradeoffs.png)
+        ![Tradeoffs](./assets/02-model-tradeoffs.png)
 
 1. **Scenarios: Rank Models By Task Category**
     - The above look at a broad set of benchmarks for various categories
@@ -166,6 +175,7 @@ Zava is a fictitious enterprise retailer of home improvement goods for DIV enthu
     - o3 ranks high in Reasoning - but low in vulnerability to harmful behavior
     - gpt-5 is great at Math - but moderately vulnerable to harmful behavior
     - Use _Models selected_ filter - compare your own subset of candidates!
+        ![Scenarios](./assets/03-model-scenarios.png)
 
 1. **Congratulations!!** - You used evaluators to do your model selection!
 
@@ -187,7 +197,7 @@ But where can you get this data if you have yet to build an application?
 
 <br/>
 
-### Demo 3: Evaluation Flow
+### Demo 3: Evaluation 
 
 <br/>
 
