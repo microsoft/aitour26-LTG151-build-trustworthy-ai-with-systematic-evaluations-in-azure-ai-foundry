@@ -50,7 +50,7 @@ We'll use [this setup guidance](https://learn.microsoft.com/en-us/azure/ai-found
 
 ![Setup](./assets/standard-agent-setup.png)
 
-1. First, update `infra/azuredeploy.parameters.json` to customize any parameters. I set:
+1. First, update `infra/azuredeploy.parameters.json` to your infrastructure needs:
     - _modelName_ to `gpt-4.1`
     - _modelVersion_ to `2025-04-14` to match
     - _location_ to `francecentral` 
@@ -66,7 +66,7 @@ We'll use [this setup guidance](https://learn.microsoft.com/en-us/azure/ai-found
     az login
 
     # 3. Create resoure group with desired name and location
-    az group create --name <new-rg-name> --location westus
+    az group create --name <new-rg-name> --location <selected-region>
 
     # 4. Deploy the template to that location.
      az deployment group create --resource-group <new-rg-name> --template-file main.bicep --parameters @azuredeploy.parameters.json
@@ -105,17 +105,12 @@ We'll use [this setup guidance](https://learn.microsoft.com/en-us/azure/ai-found
     ```bash
     ./src/scripts/update-roles.sh 
     ```
-1. Manually add an `embedding model` to your AI Foundry Project
+1. **IMPORTANT**: Manually add an `embedding model` to your AI Foundry Project
     - Visit [Azure AI Foundry portal](https://ai.azure.com)
     - Locate your Azure AI Project resource > Models & Endpoints tab
     - Deploy a `text-embedding-ada-002` model (manually for now)
 
-1. To create a search index, we need an embedding model. 
-    - Open the Azure AI Foundry project created earlier
-    - Deploy a `text-embedding-ada-002` model for use manually 
-    - This takes just a minute (We will automate this in future)
-
-1. You can now populate the search index. 
+1. You can now populate the search index with Zava products
     ```bash
     python src/scripts/setup_aisearch.py 
     ```
@@ -147,7 +142,12 @@ Zava is a fictitious enterprise retailer of home improvement goods for DIV enthu
 - Azure AI Foundry provides a unified platform for developing agentic AI
 - Trustworthy AI builds on E2E observability - from plan to production!
 
+<br/>
+
 ### Demo 1: Leaderboards
+
+> **Challenge:** How do I find the right base model for my task? <br/>
+**Solution:** Use built-in leaderboards to "compare and contrast" different models in catalog.
 
 [Model Leaderboards](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-benchmarks) streamline the model selection process using industry-standard benchmarks to assess the performance and behavior of models in the catalog. For this demo, simply keep the [Leaderboards page](https://ai.azure.com/explore/models/leaderboard) open and talk through 3 features that help model selection.
 
@@ -183,29 +183,115 @@ Zava is a fictitious enterprise retailer of home improvement goods for DIV enthu
 
 ### Demo 2: Simulator
 
-Just like applications have _test-driven development_, AI applications have _evaluation-driven development_ where the "testing" assesses response quality & safety (for models) and execution efficiency (for agents). But to run tests, we need a _testing dataset_ that provides representative queries (prompts) and "ground truth" (context) that we can then use to evaluate others.
+> **Challenge:** Where can I find data (test prompts, context) for evaluations? <br/>
+**Solution:** Generate synthetic datasets from your search index using Simulator
+
+Just like applications have _test-driven development_, AI applications have _evaluation-driven development_ where the "testing" assesses response quality & safety (for models) and execution efficiency (for agents). But to run tests, we need a _testing dataset_ that provides representative queries (prompts) and "ground truth" (context) that we can then use to evaluate responses
 
 But where can you get this data if you have yet to build an application? 
 - The Evaluation SDK has a Simulator to generate synthetic data
 - It can generate "N" rows of test data from an Azure AI Search index
-- You can now get "starter" testing datasets from your product catalog data
+    - test query (sample prompt)
+    - relevant context (ground truth for response)
+    - response (sample output)
+- Use the query/context for testing live endpoints (evaluation target)
+- Use (and customize) responses for mock testing (evaluate scenarios)
 
 
 **Try it out**: Run the [02-simulate-dataset.ipynb](./notebooks/02-simulate-dataset.ipynb) notebook. You should see an end-result like this with 10 question-answer pairs generated based on the Azure AI Search index with a seed query on "eggshell paint". _You can now use this query/truth/response dataset as test inputs for evaluations_.
 
-![Simulator Results](./assets/04-simulator-results.png)
+![Simulator Results](./assets/04-simulator-dataset.png)
 
 <br/>
 
 ### Demo 3: Evaluation 
 
+> **Challenge:** How do I assess my AI agent for quality, safety & effectiveness? <br/>
+**Solution:** Use an AI-assisted evaluation with built-in evaluators and your dataset
+
+Evaluation is the foundation of trust in AI applications. Just like applications have _test-driven development_, AI applications need _evaluation-driven development_ where testing assesses response quality & safety (for models) and execution efficiency (for agents). But traditional testing isn't enough - we need AI-assisted evaluation using specialized evaluators.
+
+The Azure AI Foundry platform provides:
+- **Evaluators** - built-in tools to assess quality, safety, and reliability
+- **Simulator** - utility to generate synthetic test datasets
+- **`evaluate()`** - function to configure and run evaluations
+
+**Try it out**: Run the [03-first-evaluation.ipynb](./notebooks/03-first-evaluation.ipynb) notebook. You'll see three key workflows:
+
+1. **Setup: Configure Quality Evaluators**
+    - Relevance - measures how well the response aligns with the context
+    - Groundedness - assesses if the response is based on provided information
+    - Coherence - evaluates logical flow and readability of responses
+    - Example: _Testing our Zava assistant responses for relevance_
+        ![Quality Dashboard](./assets/02-quality-dashboard.png)
+
+2. **Setup: Configure Safety Evaluators**
+    - Content Safety - detects hate, violence, sexual, and self-harm content
+    - Protected Material - identifies copyrighted or proprietary content
+    - Jailbreak Detection - catches adversarial prompt attacks
+    - Example: _Running safety evaluations on the test dataset_
+        ![Safety Dashboard](./assets/03-safety-dashboard.png)
+
+3. **Run: Execute Evaluation & View Results**
+    - Run `evaluate()` function with your dataset and evaluators
+    - View results locally (JSON output) or in Azure AI Foundry portal
+    - Analyze metrics across all test queries in your dataset
+    - Example: _Local results showing quality scores for each query_
+        ![Local Results](./assets/03-local-results.png)
+    - Example: _Detailed safety metrics for violence detection_
+        ![Violence Data](./assets/03-violence-data.png)
+
+4. **Congratulations!!** - You ran your first AI-assisted evaluation!
+
 <br/>
 
 ### Demo 4: Evaluators
 
+> **Challenge:** What kinds of metrics can I get from my evaluations? <br/>
+**Solution:** AIF provides built-in evaluators - or you can build custom ones!
+
+Azure AI Foundry provides a comprehensive suite of built-in evaluators covering multiple use cases. But what makes AI agents unique? Unlike simple query-response systems, agents involve multi-step workflows with:
+- **Intent Recognition** - Understanding what the user wants
+- **Tool Selection & Usage** - Choosing and correctly using available tools
+- **Task Execution** - Following through on assigned workflows
+- **Response Generation** - Providing helpful and accurate responses
+
+Each step needs evaluation! Azure AI Foundry provides specialized **agent evaluators**:
+
+**Try it out**: Run the [04-explore-evaluators.ipynb](./notebooks/04-explore-evaluators.ipynb) notebook. You'll explore agent-specific evaluators:
+
+1. **Intent Resolution Evaluator**
+    - Measures whether the agent correctly identifies user intent
+    - Critical for multi-intent conversations
+    - Example: Does the agent understand "What's the weather tomorrow?" correctly?
+
+2. **Tool Call Accuracy Evaluator**
+    - Assesses whether the agent made correct function tool calls
+    - Validates proper API/tool usage in workflows
+    - Example: Did the agent call the weather API with right parameters?
+
+3. **Task Adherence Evaluator**
+    - Measures whether agent's response adheres to assigned tasks
+    - Ensures the agent stays on track with its purpose
+    - Example: Did the assistant stick to helping with paint products?
+
+4. **Standard Evaluators Still Apply**
+    - Quality evaluators: Relevance, Groundedness, Coherence
+    - Safety evaluators: Content Safety, Jailbreak Detection
+    - All work alongside agent-specific evaluators!
+
+5. **Custom Evaluators: Build Your Own**
+    - Create domain-specific evaluators for your use case
+    - Use LLM-as-judge pattern with your criteria
+    - Example: _Custom "product accuracy" evaluator for Zava_
+
+6. **Congratulations!!** - You explored the full range of evaluators!
+
 <br/>
 
 ## 4. Teardown Infrastructure
+
+1. Reinforce the core takeaway message - encourage learners to try demos at home
 
 1. Once your demos are done, don't forget to tear down the resource group!
 

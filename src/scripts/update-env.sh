@@ -7,21 +7,10 @@ RESOURCE_GROUP="$1"
 # Get the script directory and set ENV_FILE to root of repo
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../../.env"
-ENV_SAMPLE="$SCRIPT_DIR/../../.env.sample"
 
 if [ -z "$RESOURCE_GROUP" ]; then
   echo "Usage: $0 <resource-group-name>"
   exit 1
-fi
-
-# Copy .env.sample to .env if .env doesn't exist
-if [ ! -f "$ENV_FILE" ]; then
-  if [ -f "$ENV_SAMPLE" ]; then
-    echo "Copying .env.sample to .env..."
-    cp "$ENV_SAMPLE" "$ENV_FILE"
-  else
-    echo "Warning: .env.sample not found. Creating new .env file..."
-  fi
 fi
 
 echo "Fetching Azure resource values for resource group: $RESOURCE_GROUP"
@@ -38,33 +27,57 @@ AI_PROJECT_FULL=$(az resource list --resource-group "$RESOURCE_GROUP" --resource
 AI_PROJECT_NAME="${AI_PROJECT_FULL##*/}"
 
 # Get OpenAI endpoint, API version, and API key
-# Look for Azure AI Services or OpenAI service
-OPENAI_RESOURCE=$(az cognitiveservices account list --resource-group "$RESOURCE_GROUP" --query "[?kind=='AIServices' || kind=='OpenAI'].name | [0]" -o tsv)
+# First, try to find a dedicated OpenAI resource
+OPENAI_RESOURCE=$(az cognitiveservices account list --resource-group "$RESOURCE_GROUP" --query "[?kind=='OpenAI'].name | [0]" -o tsv)
+
+# If not found, look for AIServices account (which includes OpenAI)
 if [ -z "$OPENAI_RESOURCE" ]; then
-  echo "Warning: No Azure OpenAI resource found. Trying alternate query..."
-  OPENAI_RESOURCE=$(az cognitiveservices account list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv)
+  echo "No dedicated OpenAI resource found. Looking for AIServices account..."
+  OPENAI_RESOURCE=$(az cognitiveservices account list --resource-group "$RESOURCE_GROUP" --query "[?kind=='AIServices'].name | [0]" -o tsv)
 fi
 
-# Get the endpoint in format: https://<resource-name>.openai.azure.com/
-OPENAI_ENDPOINT=$(az cognitiveservices account show --name "$OPENAI_RESOURCE" --resource-group "$RESOURCE_GROUP" --query "properties.endpoint" -o tsv)
-
-# Ensure endpoint has proper format (https:// and trailing /)
-if [ -n "$OPENAI_ENDPOINT" ]; then
-  # Add https:// if not present
-  if [[ ! "$OPENAI_ENDPOINT" =~ ^https?:// ]]; then
-    OPENAI_ENDPOINT="https://${OPENAI_ENDPOINT}"
+if [ -n "$OPENAI_RESOURCE" ]; then
+  # Try to get the OpenAI-specific endpoint from the endpoints object
+  OPENAI_ENDPOINT=$(az cognitiveservices account show --name "$OPENAI_RESOURCE" --resource-group "$RESOURCE_GROUP" --query "properties.endpoints.\"OpenAI Language Model Instance API\"" -o tsv 2>/dev/null)
+  
+  # If that doesn't work, try alternate endpoint names
+  if [ -z "$OPENAI_ENDPOINT" ] || [ "$OPENAI_ENDPOINT" == "null" ]; then
+    echo "Trying alternate endpoint query..."
+    OPENAI_ENDPOINT=$(az cognitiveservices account show --name "$OPENAI_RESOURCE" --resource-group "$RESOURCE_GROUP" --query "properties.endpoints.\"Azure OpenAI Legacy API - Latest moniker\"" -o tsv 2>/dev/null)
   fi
-  # Add trailing slash if not present
-  if [[ ! "$OPENAI_ENDPOINT" =~ /$ ]]; then
-    OPENAI_ENDPOINT="${OPENAI_ENDPOINT}/"
+  
+  # If still not found, construct it from the resource name
+  if [ -z "$OPENAI_ENDPOINT" ] || [ "$OPENAI_ENDPOINT" == "null" ]; then
+    echo "Constructing OpenAI endpoint from resource name..."
+    OPENAI_ENDPOINT="https://${OPENAI_RESOURCE}.openai.azure.com/"
   fi
-fi
-
-# Try to get API key - if it fails, leave it empty
-OPENAI_API_KEY=$(az cognitiveservices account keys list --name "$OPENAI_RESOURCE" --resource-group "$RESOURCE_GROUP" --query "key1" -o tsv 2>/dev/null)
-if [ -z "$OPENAI_API_KEY" ]; then
-  echo "Warning: Could not retrieve API key automatically. You may need to retrieve it manually from the Azure Portal."
-  OPENAI_API_KEY="<retrieve-from-portal>"
+  
+  # Ensure endpoint has proper format (https:// and trailing /)
+  if [ -n "$OPENAI_ENDPOINT" ] && [ "$OPENAI_ENDPOINT" != "null" ]; then
+    # Add https:// if not present
+    if [[ ! "$OPENAI_ENDPOINT" =~ ^https?:// ]]; then
+      OPENAI_ENDPOINT="https://${OPENAI_ENDPOINT}"
+    fi
+    # Add trailing slash if not present
+    if [[ ! "$OPENAI_ENDPOINT" =~ /$ ]]; then
+      OPENAI_ENDPOINT="${OPENAI_ENDPOINT}/"
+    fi
+  fi
+  
+  # Try to get API key
+  OPENAI_API_KEY=$(az cognitiveservices account keys list --name "$OPENAI_RESOURCE" --resource-group "$RESOURCE_GROUP" --query "key1" -o tsv 2>/dev/null)
+  if [ -z "$OPENAI_API_KEY" ]; then
+    echo "Warning: Could not retrieve OpenAI API key automatically. You may need to retrieve it manually from the Azure Portal."
+    OPENAI_API_KEY="<retrieve-from-portal>"
+  fi
+  
+  echo "Found Azure resource: $OPENAI_RESOURCE"
+  echo "OpenAI endpoint: $OPENAI_ENDPOINT"
+else
+  echo "ERROR: No Azure OpenAI or AIServices resource found in resource group $RESOURCE_GROUP"
+  echo "Please ensure you have an Azure OpenAI service deployed."
+  OPENAI_ENDPOINT="<not-found>"
+  OPENAI_API_KEY="<not-found>"
 fi
 
 OPENAI_API_VERSION="2025-02-01-preview"
@@ -85,8 +98,6 @@ fi
 OPENAI_DEPLOYMENT="gpt-4.1"
 OPENAI_MODEL_VERSION="2025-04-14"
 
-# Data file path
-SEARCH_DATAFILE="data/products.csv"
 
 # Function to update or add env variable
 update_env_var() {
@@ -112,7 +123,6 @@ update_env_var "AZURE_AI_FOUNDRY_NAME" "$AI_FOUNDRY_NAME"
 update_env_var "AZURE_AI_PROJECT_NAME" "$AI_PROJECT_NAME"
 update_env_var "AZURE_OPENAI_DEPLOYMENT" "$OPENAI_DEPLOYMENT"
 update_env_var "AZURE_OPENAI_MODEL_VERSION" "$OPENAI_MODEL_VERSION"
-update_env_var "AZURE_SEARCH_DATAFILE" "$SEARCH_DATAFILE"
 update_env_var "AZURE_SEARCH_ENDPOINT" "$SEARCH_ENDPOINT"
 update_env_var "AZURE_SEARCH_INDEX_NAME" "$SEARCH_INDEX"
 update_env_var "AZURE_SEARCH_API_KEY" "$SEARCH_API_KEY"
