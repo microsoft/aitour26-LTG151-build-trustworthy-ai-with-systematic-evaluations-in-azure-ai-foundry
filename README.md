@@ -14,7 +14,7 @@
 🎙️ | **Delivering This Session On The Tour?**
 
 - 1️⃣ | Fork this repo to your personal profile
-- 2️⃣ | Check out the [session-delivery-sources](./session-delivery-resources/) for next steps
+- 2️⃣ | Check out the [session-delivery-sources](./session-delivery-resources/) & read the [Demo Guidance](./src/README.md)
 - 3️⃣ | Submit an [issue](https://github.com/microsoft/aitour26-LTG151-build-trustworthy-ai-with-systematic-evaluations-in-azure-ai-foundry/issues/new) if you find bugs or have
 
 ---
