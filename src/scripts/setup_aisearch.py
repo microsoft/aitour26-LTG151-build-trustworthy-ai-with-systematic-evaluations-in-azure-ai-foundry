@@ -62,7 +62,7 @@ def load_environment():
         print("No .env file found in repository root, using system environment variables")
     
     # Verify required environment variables
-    required_vars = ["AZURE_AISEARCH_ENDPOINT", "AZURE_OPENAI_ENDPOINT", "AZURE_AISEARCH_INDEX"]
+    required_vars = ["AZURE_SEARCH_ENDPOINT", "AZURE_OPENAI_ENDPOINT", "AZURE_SEARCH_INDEX_NAME"]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     
     if missing_vars:
@@ -281,8 +281,8 @@ def main():
         sys.exit(1)
     
     # Get configuration from environment variables
-    search_endpoint = os.environ["AZURE_AISEARCH_ENDPOINT"]
-    index_name = os.environ["AZURE_AISEARCH_INDEX"]
+    search_endpoint = os.environ["AZURE_SEARCH_ENDPOINT"]
+    index_name = os.environ["AZURE_SEARCH_INDEX_NAME"]
     
     print(f"Search endpoint: {search_endpoint}")
     print(f"Index name: {index_name}")

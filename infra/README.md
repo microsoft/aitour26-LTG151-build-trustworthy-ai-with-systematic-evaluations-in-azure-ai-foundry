@@ -16,7 +16,7 @@ For more details on the standard agent setup, see the [standard agent setup conc
 1. Create new (or use existing) resource group:
 
 ```bash
-    az group create --name <new-rg-name> --location westus
+    az group create --name <new-rg-name> --location francecentral
 ```
 
 2. Deploy the template
